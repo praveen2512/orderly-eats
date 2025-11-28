@@ -87,6 +87,98 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          loyalty_points: number | null
+          name: string | null
+          phone: string
+          store_id: string
+          total_orders: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          loyalty_points?: number | null
+          name?: string | null
+          phone: string
+          store_id: string
+          total_orders?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          loyalty_points?: number | null
+          name?: string | null
+          phone?: string
+          store_id?: string
+          total_orders?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory: {
+        Row: {
+          created_at: string | null
+          current_stock: number
+          id: string
+          last_restocked_at: string | null
+          min_stock_threshold: number | null
+          product_id: string
+          store_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_stock?: number
+          id?: string
+          last_restocked_at?: string | null
+          min_stock_threshold?: number | null
+          product_id: string
+          store_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_stock?: number
+          id?: string
+          last_restocked_at?: string | null
+          min_stock_threshold?: number | null
+          product_id?: string
+          store_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kiosks: {
         Row: {
           created_at: string | null
@@ -94,6 +186,8 @@ export type Database = {
           is_active: boolean | null
           location: string | null
           name: string
+          requires_pin: boolean | null
+          staff_pin: string | null
           store_id: string
           updated_at: string | null
         }
@@ -103,6 +197,8 @@ export type Database = {
           is_active?: boolean | null
           location?: string | null
           name: string
+          requires_pin?: boolean | null
+          staff_pin?: string | null
           store_id: string
           updated_at?: string | null
         }
@@ -112,6 +208,8 @@ export type Database = {
           is_active?: boolean | null
           location?: string | null
           name?: string
+          requires_pin?: boolean | null
+          staff_pin?: string | null
           store_id?: string
           updated_at?: string | null
         }
@@ -209,44 +307,66 @@ export type Database = {
       orders: {
         Row: {
           created_at: string | null
+          customer_id: string | null
           customer_name: string | null
+          discount_amount: number | null
           id: string
           kiosk_id: string | null
           order_number: string
           order_type: Database["public"]["Enums"]["order_type"]
           status: Database["public"]["Enums"]["order_status"] | null
           store_id: string
+          subtotal_amount: number | null
           table_id: string | null
+          tax_amount: number | null
+          tip_amount: number | null
           total_amount: number
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          customer_id?: string | null
           customer_name?: string | null
+          discount_amount?: number | null
           id?: string
           kiosk_id?: string | null
           order_number: string
           order_type: Database["public"]["Enums"]["order_type"]
           status?: Database["public"]["Enums"]["order_status"] | null
           store_id: string
+          subtotal_amount?: number | null
           table_id?: string | null
+          tax_amount?: number | null
+          tip_amount?: number | null
           total_amount: number
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          customer_id?: string | null
           customer_name?: string | null
+          discount_amount?: number | null
           id?: string
           kiosk_id?: string | null
           order_number?: string
           order_type?: Database["public"]["Enums"]["order_type"]
           status?: Database["public"]["Enums"]["order_status"] | null
           store_id?: string
+          subtotal_amount?: number | null
           table_id?: string | null
+          tax_amount?: number | null
+          tip_amount?: number | null
           total_amount?: number
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_kiosk_id_fkey"
             columns: ["kiosk_id"]
@@ -266,6 +386,45 @@ export type Database = {
             columns: ["table_id"]
             isOneToOne: false
             referencedRelation: "restaurant_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_splits: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          order_id: string
+          payment_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          order_id: string
+          payment_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_splits_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_splits_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
             referencedColumns: ["id"]
           },
         ]
@@ -352,6 +511,8 @@ export type Database = {
           prep_time_minutes: number | null
           price: number
           store_id: string
+          tax_percentage: number | null
+          tax_type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -367,6 +528,8 @@ export type Database = {
           prep_time_minutes?: number | null
           price: number
           store_id: string
+          tax_percentage?: number | null
+          tax_type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -382,6 +545,8 @@ export type Database = {
           prep_time_minutes?: number | null
           price?: number
           store_id?: string
+          tax_percentage?: number | null
+          tax_type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -406,7 +571,9 @@ export type Database = {
           capacity: number | null
           created_at: string | null
           id: string
+          is_active: boolean | null
           is_occupied: boolean | null
+          qr_code_url: string | null
           store_id: string
           table_number: string
         }
@@ -414,7 +581,9 @@ export type Database = {
           capacity?: number | null
           created_at?: string | null
           id?: string
+          is_active?: boolean | null
           is_occupied?: boolean | null
+          qr_code_url?: string | null
           store_id: string
           table_number: string
         }
@@ -422,7 +591,9 @@ export type Database = {
           capacity?: number | null
           created_at?: string | null
           id?: string
+          is_active?: boolean | null
           is_occupied?: boolean | null
+          qr_code_url?: string | null
           store_id?: string
           table_number?: string
         }
@@ -477,9 +648,90 @@ export type Database = {
           },
         ]
       }
+      suppliers: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          phone: string | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          store_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          store_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          store_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           created_at: string | null
+          currency: string | null
+          currency_symbol: string | null
           id: string
           logo_url: string | null
           name: string
@@ -488,6 +740,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          currency?: string | null
+          currency_symbol?: string | null
           id?: string
           logo_url?: string | null
           name: string
@@ -496,6 +750,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          currency?: string | null
+          currency_symbol?: string | null
           id?: string
           logo_url?: string | null
           name?: string
@@ -509,9 +765,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "vendor_admin" | "store_manager" | "cashier" | "kitchen_staff"
       order_status:
         | "pending"
         | "preparing"
@@ -648,6 +911,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["vendor_admin", "store_manager", "cashier", "kitchen_staff"],
       order_status: [
         "pending",
         "preparing",

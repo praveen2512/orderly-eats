@@ -173,7 +173,9 @@ const Kiosk = () => {
           </div>
           <Button
             size="lg"
-            onClick={() => navigate(`/checkout?store=${storeId}`)}
+            onClick={() => navigate(`/checkout?store=${storeId}`, { 
+              state: { cart, orderType, currency: "₹" } 
+            })}
             disabled={cart.length === 0}
             className="relative bg-primary hover:bg-primary/90 shadow-glow"
           >
