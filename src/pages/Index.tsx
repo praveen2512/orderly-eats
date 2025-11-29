@@ -96,7 +96,7 @@ const Index = () => {
           </div>
 
           {/* Features */}
-          <Card className="p-12 shadow-card animate-fade-in">
+          <Card className="p-12 shadow-card animate-fade-in hidden">
             <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-primary bg-clip-text text-transparent">
               Key Features
             </h2>
