@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Plus, Edit, Trash2, Package } from "lucide-react";
+import { Search, Edit, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
+import AddProductModal from "./AddProduct";
 
 interface Product {
   id: string;
@@ -83,10 +84,10 @@ const Products = () => {
               />
             </div>
           </div>
-          <Button className="bg-gradient-primary shadow-glow w-full md:w-auto">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
+          <AddProductModal
+            storeId={storeId}
+            onProductAdded={loadProducts}
+          />
         </div>
       </Card>
 
@@ -149,7 +150,7 @@ const Products = () => {
             </Card>
           ))
         )}
-      </div>
+      </div>      
     </div>
   );
 };

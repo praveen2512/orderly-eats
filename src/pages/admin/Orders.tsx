@@ -29,10 +29,35 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | "all">("all");
 
+  // useEffect(() => {
+  //   if (storeId) {
+  //     loadOrders();
+  //   }
+  // }, [storeId]);
+
   useEffect(() => {
-    if (storeId) {
-      loadOrders();
-    }
+    loadOrders();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel("kitchen-orders")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "orders",
+          filter: `store_id=eq.${storeId}`,
+        },
+        () => {
+          loadOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [storeId]);
 
   const loadOrders = async () => {
