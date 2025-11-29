@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ShoppingCart, Plus, Minus, Sparkles, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { Navigation } from "@/components/Navigation";
 
 type OrderType = "dine_in" | "take_away";
 
@@ -160,8 +161,9 @@ const Kiosk = () => {
 
   return (
     <div className="min-h-screen bg-gradient-warm">
+      <Navigation />
       {/* Header */}
-      <header className="bg-card shadow-card sticky top-0 z-50">
+      <header className="bg-card shadow-card sticky top-16 z-10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">

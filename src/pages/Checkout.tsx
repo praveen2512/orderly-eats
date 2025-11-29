@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, CreditCard, Smartphone, Banknote, Printer } from "lucide-react";
+import { ArrowLeft, CreditCard, Smartphone, Banknote, Printer, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Navigation } from "@/components/Navigation";
 
 type PaymentMethod = "card" | "upi" | "cash";
 
@@ -27,6 +28,9 @@ const Checkout = () => {
   const [tipAmount, setTipAmount] = useState(0);
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [orderDetails, setOrderDetails] = useState<any>(null);
 
   // Calculate totals
   const subtotal = cart.reduce((sum: number, item: any) => sum + item.product.price * item.quantity, 0);
@@ -37,12 +41,15 @@ const Checkout = () => {
   }, 0);
   const total = subtotal + taxAmount + tipAmount;
 
-  const handlePlaceOrder = async () => {
+  const handleContinueToPayment = () => {
     if (!customerName.trim()) {
       toast.error("Please enter customer name");
       return;
     }
+    setShowPayment(true);
+  };
 
+  const handleConfirmPayment = async () => {
     setProcessing(true);
 
     try {
@@ -126,13 +133,15 @@ const Checkout = () => {
         }
       }
 
+      setOrderDetails(order);
+      setShowReceipt(true);
       toast.success("Order placed successfully!");
       
-      // Simulate receipt printing
+      // Auto-print receipt
       setTimeout(() => {
-        toast.success("Receipt printed successfully");
-        navigate(`/kiosk?store=${storeId}`);
-      }, 1500);
+        window.print();
+        toast.success("Receipt sent to printer");
+      }, 1000);
 
     } catch (error) {
       console.error("Error placing order:", error);
@@ -142,8 +151,118 @@ const Checkout = () => {
     }
   };
 
+  if (showReceipt && orderDetails) {
+    return (
+      <div className="min-h-screen bg-gradient-warm">
+        <Navigation />
+        
+        <div className="container mx-auto px-6 py-8">
+          <Card className="max-w-2xl mx-auto p-8 shadow-glow">
+            <div className="text-center mb-8">
+              <div className="bg-success/10 p-4 rounded-full inline-block mb-4">
+                <CheckCircle className="w-16 h-16 text-success" />
+              </div>
+              <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
+              <p className="text-muted-foreground">Order #{orderDetails.order_number}</p>
+            </div>
+
+            <div className="border-t border-b py-6 mb-6">
+              <h3 className="font-bold mb-4">Order Details</h3>
+              {cart.map((item: any) => (
+                <div key={item.product.id} className="flex justify-between mb-2">
+                  <span>{item.product.name} x{item.quantity}</span>
+                  <span>{currency}{(item.product.price * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+              <div className="border-t pt-4 mt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{currency}{subtotal.toFixed(2)}</span>
+                </div>
+                {taxAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Tax</span>
+                    <span>{currency}{taxAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                {tipAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Tip</span>
+                    <span>{currency}{tipAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-xl font-bold pt-2 border-t">
+                  <span>Total</span>
+                  <span className="text-primary">{currency}{total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Button onClick={() => window.print()} variant="outline" className="w-full">
+                <Printer className="w-4 h-4 mr-2" />
+                Print Receipt
+              </Button>
+              <Button onClick={() => navigate(`/kiosk?store=${storeId}`)} className="w-full bg-gradient-primary">
+                Return to Kiosk
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (showPayment) {
+    return (
+      <div className="min-h-screen bg-gradient-warm">
+        <Navigation />
+        
+        <div className="container mx-auto px-6 py-8">
+          <Card className="max-w-2xl mx-auto p-8 shadow-glow">
+            <h2 className="text-2xl font-bold mb-6 text-center">Complete Payment</h2>
+            
+            <div className="mb-6 p-6 bg-accent/10 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-lg">Total Amount</span>
+                <span className="text-3xl font-bold text-primary">{currency}{total.toFixed(2)}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">Payment Method: {paymentMethod.toUpperCase()}</p>
+            </div>
+
+            <div className="mb-6 p-6 border-2 border-dashed rounded-lg text-center">
+              <CreditCard className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground mb-2">Mock Payment Gateway</p>
+              <p className="text-sm text-muted-foreground">This is a simulation. Click confirm to proceed.</p>
+            </div>
+
+            <div className="space-y-3">
+              <Button 
+                onClick={handleConfirmPayment} 
+                disabled={processing}
+                className="w-full bg-gradient-primary shadow-glow h-14 text-lg"
+              >
+                {processing ? "Processing..." : "Confirm Payment"}
+              </Button>
+              <Button 
+                onClick={() => setShowPayment(false)} 
+                variant="outline"
+                className="w-full"
+                disabled={processing}
+              >
+                Back
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-warm">
+      <Navigation />
+      
       <header className="bg-card shadow-card">
         <div className="container mx-auto px-6 py-4 flex items-center gap-4">
           <Button
@@ -293,18 +412,11 @@ const Checkout = () => {
               </div>
 
               <Button
-                onClick={handlePlaceOrder}
+                onClick={handleContinueToPayment}
                 disabled={processing || cart.length === 0}
                 className="w-full mt-6 bg-gradient-primary shadow-glow text-lg h-14"
               >
-                {processing ? (
-                  "Processing..."
-                ) : (
-                  <>
-                    <Printer className="w-5 h-5 mr-2" />
-                    Place Order & Print
-                  </>
-                )}
+                Continue to Payment
               </Button>
 
               <p className="text-xs text-center text-muted-foreground mt-4">

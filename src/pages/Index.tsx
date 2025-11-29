@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { ChefHat, Store, Laptop, TrendingUp } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-warm">
+      <Navigation />
       <div className="container mx-auto px-6 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
