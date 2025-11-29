@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ChefHat, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { Navigation } from "@/components/Navigation";
 
 interface Order {
   id: string;
@@ -109,8 +110,11 @@ const Kitchen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-warm p-8">
-      <header className="mb-8">
+    <div className="min-h-screen bg-gradient-warm">
+      <Navigation />
+      
+      <div className="p-8">
+        <header className="mb-8">
         <div className="flex items-center gap-4 mb-4">
           <div className="bg-primary text-primary-foreground p-4 rounded-2xl shadow-glow">
             <ChefHat className="w-12 h-12" />
@@ -199,6 +203,7 @@ const Kitchen = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };
